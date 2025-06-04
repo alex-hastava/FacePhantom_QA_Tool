@@ -1,5 +1,3 @@
-# face_phantom_field_coincidence_v2.0.py
-# ------------------------------------------------------
 # PyLinac Integration Module - Light & Radiation Field Coincidence QA
 # Developed by: Alex Hastava
 #

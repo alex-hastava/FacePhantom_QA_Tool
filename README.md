@@ -1,16 +1,16 @@
 # FacePhantom QA Tool
 
-A Python-based QA automation tool for analyzing light and radiation field coincidence using DICOM images acquired from an EPID. This tool uses the proprietary Face Phantom device to determine light field geometry via BB detection and compares it with radiation field boundaries obtained via PyLinac. Results are saved as a detailed visual PDF report and a structured CSV table.
+A Python-based QA tool for analyzing light and radiation field coincidence on DICOM images acquired using an EPID. This tool leverages the proprietary **Face Phantom** device to determine light field geometry via BB marker detection, and compares it with radiation field boundaries extracted using PyLinac. The output includes a detailed visual PDF report and a structured CSV results table.
 
 ---
 
 ## Features
 
-- Detects BB markers using Hough Circle Transform
-- Extracts radiation field edges using PyLinac’s FieldAnalysis
-- Performs SID/SAD-based geometric scaling for accurate comparison
-- Generates annotated PDF reports with overlays and pass/fail criteria
-- Outputs CSV results of field edge distances and tolerances
+- Automated BB detection via Hough Circle Transform
+- Radiation field analysis using PyLinac's `FieldAnalysis`
+- Geometric scaling based on SAD/SID distances
+- Annotated PDF reports with overlays and pass/fail indicators
+- CSV output with quantitative edge comparison results
 
 ---
 
@@ -24,7 +24,7 @@ cd FacePhantom_QA_Tool
 pip install -r requirements.txt
 ```
 
-> Python 3.8+ is required.
+> Requires Python 3.8 or later.
 
 ---
 
@@ -32,25 +32,29 @@ pip install -r requirements.txt
 
 ### Option 1: Run as Python Script
 
-From the project root:
+From the project root directory:
 
 ```bash
 python facephantom_qa/main.py
 ```
 
-You will be prompted to select one or more DICOM files. After processing, the following files will be generated in the same directory:
+A file dialog will appear prompting you to select one or more `.dcm` files.
 
-- `FieldCoincidenceQA_Report.pdf`
-- `FieldCoincidenceQA_Results.csv`
+**Output Files:**
 
-### Option 2: Run Executable (No Python Needed)
+- `FieldCoincidenceQA_Report.pdf` — Annotated report with light/radiation field overlays
+- `FieldCoincidenceQA_Results.csv` — Summary table of measurements and QA results
 
-If using the built executable:
+These files are saved in the same directory from which the script or executable is run.
+
+---
+
+### Option 2: Run as Executable (No Python Required)
 
 1. Download `FacePhantomQA.exe` from the latest [GitHub Release](https://github.com/alex-hastava/FacePhantom_QA_Tool/releases)
-2. Double-click to launch
-3. Select your `.dcm` files from the file dialog
-4. Wait for the report and results to appear
+2. Double-click the executable
+3. Select one or more `.dcm` files via the file dialog
+4. Wait for analysis to complete; output files will appear in the same folder
 
 ---
 
@@ -61,38 +65,55 @@ FacePhantom_QA_Tool/
 ├── facephantom_qa/
 │   ├── __init__.py
 │   ├── main.py
-│   └── qa_gant_col_img/        # (optional: sample .dcm images)
+│   └── qa_gant_col_img/        # Optional: sample .dcm images
 ├── requirements.txt
 ├── setup.py
 ├── README.md
-└── dist/                       # contains FacePhantomQA.exe (not tracked in repo)
+└── dist/                       # Contains FacePhantomQA.exe (not tracked)
 ```
+
+---
+
+## Naming Convention
+
+Couch angle is determined automatically by inspecting the DICOM filename. Include one of the following substrings in your filenames to assign the correct rotation:
+
+| Filename Tag    | Assigned Couch Angle |
+|----------------|----------------------|
+| `45_couch`     | +45°                 |
+| `90_couch`     | +90°                 |
+| `180_couch`    | +180°                |
+| `45m_couch`    | -45°                 |
+| `90m_couch`    | -90°                 |
+| `180m_couch`   | -180°                |
+
+If no valid tag is found, a default of `0°` is used.
 
 ---
 
 ## Output Files
 
-- **PDF**: Visual overlays of radiation and light fields with crosshairs and measurements
-- **CSV**: Tabulated edge distances and QA pass/fail results for each field side
+- **FieldCoincidenceQA_Report.pdf**: Annotated EPID image with crosshairs, BB markers, and field boundaries
+- **FieldCoincidenceQA_Results.csv**: Table of edge distances (light field vs radiation field) and pass/fail status per edge and center
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See `LICENSE` for details.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
 ## Author
 
 **Alex Hastava**  
-Stony Brook Medicine  
-Department of Radiation Oncology
+Department of Radiation Oncology  
+Stony Brook Medicine
 
 ---
 
 ## Acknowledgments
 
-- [PyLinac](https://github.com/jrkerns/pylinac) for field analysis methods  
-- OpenCV for image processing  
-- Pydicom for DICOM parsing
+- [PyLinac](https://github.com/jrkerns/pylinac) – Field analysis tools
+- [OpenCV](https://opencv.org) – BB marker detection
+- [Pydicom](https://pydicom.github.io) – DICOM parsing and metadata extraction
