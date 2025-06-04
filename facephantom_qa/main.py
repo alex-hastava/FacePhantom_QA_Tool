@@ -17,10 +17,12 @@ import pydicom
 import tkinter as tk
 from tkinter import filedialog
 from pylinac import Edge, FieldAnalysis, Centering, Interpolation, Protocol
+from pathlib import Path
 from matplotlib import pyplot as plt
-from matplotlib import image as mpimg
 from matplotlib.backends.backend_pdf import PdfPages
 import csv
+import sys
+import time
 import warnings
 
 warnings.filterwarnings("ignore", message=".*missing from font.*", category=UserWarning)
@@ -254,25 +256,45 @@ def process_and_plot(filepath, pdf):
 
 def main():
     """Main entry: process user-selected DICOMs and output PDF/CSV."""
+    import time
+    from pathlib import Path
+
     root = tk.Tk()
     root.withdraw()
+
+    print("=" * 60)
+    print("     FacePhantom QA Tool - Initializing", end="", flush=True)
+    for _ in range(5):
+        time.sleep(0.25)
+        print(".", end="", flush=True)
+    print("\n" + "=" * 60)
+    print("Launching file selector. Please choose one or more DICOM files...\n")
+
     files = filedialog.askopenfilenames(filetypes=[("DICOM files", "*.dcm")], title="Select DICOM QA Images")
     if not files:
-        print("No files selected.")
+        print("No files selected. Exiting.")
         return
 
-    with PdfPages("FieldCoincidenceQA_Report.pdf") as pdf:
+    output_dir = Path.cwd()
+    pdf_path = output_dir / "FieldCoincidenceQA_Report.pdf"
+    csv_path = output_dir / "FieldCoincidenceQA_Results.csv"
+
+    with PdfPages(pdf_path) as pdf:
         for file in files:
             process_and_plot(file, pdf)
 
     if csv_results:
         keys = csv_results[0].keys()
-        with open("FieldCoincidenceQA_Results.csv", "w", newline="") as f:
+        with open(csv_path, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=keys)
             writer.writeheader()
             writer.writerows(csv_results)
 
-    print("Analysis complete. Results saved to FieldCoincidenceQA_Report.pdf and FieldCoincidenceQA_Results.csv")
+    print("\nQA Analysis Complete!")
+    print(f"PDF Report saved to:   {pdf_path}")
+    print(f"CSV Results saved to:  {csv_path}")
+    print("=" * 60)
+
 
 if __name__ == "__main__":
     main()
